@@ -9,3 +9,6 @@ pom.xml
 .lein-repl-history
 .lein-plugins/
 node_modules/
+main.js
+config.clj
+.cljs_node_repl/

@@ -4,7 +4,7 @@
 
 (let [start (System/nanoTime)]
   (b/build "src"
-    {:output-to "release/stash_bot.js"
+    {:output-to "release/main.js"
      :output-dir "release"
      :optimizations :advanced
      :verbose true})

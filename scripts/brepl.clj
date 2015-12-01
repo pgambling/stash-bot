@@ -5,7 +5,7 @@
 
 (b/build "src"
   {:main 'stash-bot.core
-   :output-to "out/stash_bot.js"
+   :output-to "main.js"
    :output-dir "out"
    :verbose true})
 
