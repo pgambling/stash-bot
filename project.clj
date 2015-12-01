@@ -9,5 +9,4 @@
   :npm {:dependencies [[source-map-support "0.3.2"]]}
   :source-paths ["src" "target/classes"]
   :clean-targets ["out" "release"]
-  :target-path "target"
-  :main "out/main.js")
+  :target-path "target")
