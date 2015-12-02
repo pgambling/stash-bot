@@ -57,7 +57,6 @@
   (.sendFile res (str root-dir "/public/index.html")))
 
 (defn- test-handler [req res]
-  (println (.-body req))
   (let [led-state (-> req .-body .-ledState)]
     (if led-state
       (turn-on-led)
