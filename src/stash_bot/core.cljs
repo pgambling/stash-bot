@@ -105,7 +105,7 @@
   (set! config (read-config))
   (set! io-enabled? (:io-enabled? config))
 
-  (if (:enable-io config)
+  (if io-enabled?
     (init-hardware init-web-server)
     (init-web-server)))
 
