@@ -67,7 +67,7 @@
         board (js/five.Board. (js-obj "io" raspi-io))]
     (.on board "ready"
       (fn []
-        (set! led (js/five.Led. "P1-13"))
+        (set! led (js/five.Led. "GPIO16"))
         (next-fn)))))
 
 (defn- init-web-server []
