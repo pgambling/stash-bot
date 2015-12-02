@@ -7,7 +7,10 @@
   :jvm-opts ^:replace ["-Xmx1g" "-server"]
   :plugins [[lein-npm "0.6.1"]]
   :npm {:dependencies [[source-map-support "0.3.2"
-                        express "4.13.3"]]}
+                        express "4.13.3"
+                        johnny-five "0.9.2"
+                        raspi-io "5.0.0"]]}
+
   :source-paths ["src" "target/classes"]
   :clean-targets ["out" "release" "main.js"]
   :target-path "target")

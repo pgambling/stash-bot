@@ -24,6 +24,7 @@
 ;;------------------------------------------------------------------------------
 
 (def root-dir (.resolve path "."))
+(def led nil)
 
 (defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
@@ -46,7 +47,6 @@
   (blink-led)
   (.sendStatus res 200))
 
-
 (defn- not-found [req res]
   (.sendStatus res 404))
 
@@ -54,14 +54,16 @@
 ;; server initialization
 ;;------------------------------------------------------------------------------
 
-(defn -main [& args]
-  (when-not (.existsSync fs (str root-dir "/config.clj"))
-    (println "ERROR: config.clj not found")
-    (println "HINT: Use example_config.clj to start a new one.")
-    (.exit js/process 1))
+(defn- init-hardware [next-fn]
+  (let [five (js/require "johnny-five")
+        raspi-io (js/require "raspi-io")
+        board (js/five.Board. (js-obj "io" raspi-io))]
+    (.on board "ready"
+      (fn []
+        (set! led (js/five.Led. "P1-13"))
+        (next-fn)))))
 
-  (set! config (read-config))
-
+(defn- init-web-server []
   ; configure and start the server
   (let [app (express)
         static-file-handler (aget express "static")
@@ -75,5 +77,19 @@
       (.use not-found)
       (.listen port))
     (println (str "Listening on port " port))))
+
+(defn -main [& args]
+  (when-not (.existsSync fs (str root-dir "/config.clj"))
+    (println "ERROR: config.clj not found")
+    (println "HINT: Use example_config.clj to start a new one.")
+    (.exit js/process 1))
+
+  (set! config (read-config))
+
+  (if (:enable-io config)
+    (init-hardware init-web-server)
+    (init-web-server)))
+
+
 
 (set! *main-cli-fn* -main)
