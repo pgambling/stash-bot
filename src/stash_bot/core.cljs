@@ -31,10 +31,17 @@
        (.toString)
        (read-string)))
 
+(defn- turn-on-led []
+  (.on led))
+
+(defn- turn-off-led []
+  (.off led))
+
 (defn- blink-led []
   (println "Blink LED!")
   (when (:enable-io config)
-    (println "TODO: Hit IO"))) ;; do actual IO here
+    (turn-on-led)
+    (js/setTimeout turn-off-led 5000))) ;; turn on LED for 5 seconds
 
 ;;------------------------------------------------------------------------------
 ;; route handlers
