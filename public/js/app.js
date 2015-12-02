@@ -1,15 +1,24 @@
 (function() {
 
-function clickButton() {
+function sendLedRequest(ledState) {
   var r = new XMLHttpRequest();
   r.open("POST", "/test", true);
-  var data = { test: "foo" };
+  r.setRequestHeader("Content-Type", "application/json");
+  var data = { ledState: ledState };
   r.send(JSON.stringify(data));
 }
 
+function clickOnButton() {
+  sendLedRequest(true);
+}
+
+function clickOffButton() {
+  sendLedRequest(false);
+}
+
 function init() {
-  var btnEl = document.getElementById("theButton")  ;
-  btnEl.onclick = clickButton;
+  document.getElementById("on").onclick = clickOnButton;
+  document.getElementById("off").onclick = clickOffButton;
 }
 
 window.onload = init;

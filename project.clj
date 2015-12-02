@@ -8,6 +8,7 @@
   :plugins [[lein-npm "0.6.1"]]
   :npm {:dependencies [[source-map-support "0.3.2"
                         express "4.13.3"
+                        body-parser "1.14.1"
                         johnny-five "0.9.2"
                         raspi-io "5.0.0"]]}
 

@@ -12,12 +12,14 @@
 (def path (js/require "path"))
 (def http (js/require "http"))
 (def express (js/require "express"))
+(def body-parser (js/require "body-parser"))
 
 ;;------------------------------------------------------------------------------
 ;; atoms
 ;;------------------------------------------------------------------------------
 
 (def config nil)
+(def io-enabled? false)
 
 ;;------------------------------------------------------------------------------
 ;; general functionality
@@ -32,14 +34,18 @@
        (read-string)))
 
 (defn- turn-on-led []
-  (.on led))
+  (println "Turn on LED")
+  (when io-enabled?
+    (.on led)))
 
 (defn- turn-off-led []
-  (.off led))
+  (println "Turn off LED")
+  (when io-enabled?
+    (.off led)))
 
 (defn- blink-led []
   (println "Blink LED!")
-  (when (:enable-io config)
+  (when io-enabled?
     (turn-on-led)
     (js/setTimeout turn-off-led 5000))) ;; turn on LED for 5 seconds
 
@@ -51,8 +57,12 @@
   (.sendFile res (str root-dir "/public/index.html")))
 
 (defn- test-handler [req res]
-  (blink-led)
-  (.sendStatus res 200))
+  (println (.-body req))
+  (let [led-state (-> req .-body .-ledState)]
+    (if led-state
+      (turn-on-led)
+      (turn-off-led))
+    (.sendStatus res 200)))
 
 (defn- not-found [req res]
   (.sendStatus res 404))
@@ -79,8 +89,9 @@
         port (:port config)]
     (doto app
       (.get "/" index-handler)
-      (.post "/test" test-handler)
       (.use (static-file-handler (str root-dir "/public") static-opts))
+      (.use (.json body-parser))
+      (.post "/test" test-handler)
       (.use not-found)
       (.listen port))
     (println (str "Listening on port " port))))
@@ -92,11 +103,10 @@
     (.exit js/process 1))
 
   (set! config (read-config))
+  (set! io-enabled? (:io-enabled? config))
 
   (if (:enable-io config)
     (init-hardware init-web-server)
     (init-web-server)))
-
-
 
 (set! *main-cli-fn* -main)
