@@ -25,19 +25,29 @@
 
 (def root-dir (.resolve path "."))
 
-(defn read-config []
+(defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
        (.toString)
        (read-string)))
+
+(defn- blink-led []
+  (println "Blink LED!")
+  (when (:enable-io config)
+    (println "TODO: Hit IO"))) ;; do actual IO here
 
 ;;------------------------------------------------------------------------------
 ;; route handlers
 ;;------------------------------------------------------------------------------
 
-(defn index-handler [req res]
+(defn- index-handler [req res]
   (.sendFile res (str root-dir "/public/index.html")))
 
-(defn not-found [req res]
+(defn- test-handler [req res]
+  (blink-led)
+  (.sendStatus res 200))
+
+
+(defn- not-found [req res]
   (.sendStatus res 404))
 
 ;;------------------------------------------------------------------------------
@@ -60,6 +70,7 @@
         port (:port config)]
     (doto app
       (.get "/" index-handler)
+      (.post "/test" test-handler)
       (.use (static-file-handler (str root-dir "/public") static-opts))
       (.use not-found)
       (.listen port))
