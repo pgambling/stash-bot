@@ -64,7 +64,7 @@
 (defn- init-hardware [next-fn]
   (let [five (js/require "johnny-five")
         Raspi (js/require "raspi-io")
-        board (js/five.Board. (js-obj "io" Raspi))]
+        board (js/five.Board. (js-obj "io" (Raspi.)))]
     (.on board "ready"
       (fn []
         (set! led (js/five.Led. "GPIO16"))
