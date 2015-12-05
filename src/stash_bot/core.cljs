@@ -49,6 +49,14 @@
     (turn-on-led)
     (js/setTimeout turn-off-led 5000))) ;; turn on LED for 5 seconds
 
+(defn- remove-content-encoding
+  "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
+  [req res next-fn]
+  (let [headers (.-headers req)]
+    (js-delete headers "content-encoding")
+    (aset req "headers" headers)
+    (next-fn)))
+
 ;;------------------------------------------------------------------------------
 ;; route handlers
 ;;------------------------------------------------------------------------------
@@ -62,6 +70,19 @@
       (turn-on-led)
       (turn-off-led))
     (.sendStatus res 200)))
+
+(defn- stash-handler [req res]
+  (.sendStatus res 200) ;; Just respond with success immediately to stash
+  (let [json-body (.-body req)
+        ref-changes (.-refChanges json-body)]
+    (when (array? ref-changes)
+      (let [ref-change (aget ref-changes 0)
+            ref-id (.-refId ref-change)
+            type (.-type ref-change)
+            update-to-master? (and (= ref-id "refs/heads/master")
+                                   (= type "UPDATE"))]
+        (when update-to-master?
+          (blink-led)))))) ;; TODO: control motor and ring bell here
 
 (defn- not-found [req res]
   (.sendStatus res 404))
@@ -89,8 +110,10 @@
     (doto app
       (.get "/" index-handler)
       (.use (static-file-handler (str root-dir "/public") static-opts))
+      (.use remove-content-encoding)
       (.use (.json body-parser))
       (.post "/test" test-handler)
+      (.post "/stash-update" stash-handler)
       (.use not-found)
       (.listen port))
     (println (str "Listening on port " port))))
