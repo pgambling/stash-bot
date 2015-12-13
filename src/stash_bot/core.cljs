@@ -27,6 +27,7 @@
 
 (def root-dir (.resolve path "."))
 (def led nil)
+(def servo nil)
 
 (defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
@@ -49,6 +50,11 @@
     (turn-on-led)
     (js/setTimeout turn-off-led 5000))) ;; turn on LED for 5 seconds
 
+(defn- set-motor-degree [motor-degree]
+  (println "Set motor position to " motor-degree)
+  (when io-enabled?
+    (.to servo motor-degree)))
+
 (defn- remove-content-encoding
   "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
   [req res next-fn]
@@ -64,11 +70,17 @@
 (defn- index-handler [req res]
   (.sendFile res (str root-dir "/public/index.html")))
 
-(defn- test-handler [req res]
+(defn- led-test-handler [req res]
   (let [led-state (-> req .-body .-ledState)]
     (if led-state
       (turn-on-led)
       (turn-off-led))
+    (.sendStatus res 200)))
+
+(defn- motor-test-handler [req res]
+  (let [motor-degree (-> req .-body .-motorDegree int)]
+    (if (number? motor-degree)
+      (set-motor-degree motor-degree))
     (.sendStatus res 200)))
 
 (defn- stash-handler [req res]
@@ -98,6 +110,11 @@
     (.on board "ready"
       (fn []
         (set! led (js/five.Led. "GPIO16"))
+        (set! servo
+          (js/five.Servo
+            (clj->js
+              {:pin "GPIO18"
+               :range [0,360]})))
         (next-fn)))))
 
 (defn- init-web-server []
@@ -112,7 +129,8 @@
       (.use (static-file-handler (str root-dir "/public") static-opts))
       (.use remove-content-encoding)
       (.use (.json body-parser))
-      (.post "/test" test-handler)
+      (.post "/led-test" led-test-handler)
+      (.post "/motor-test" motor-test-handler)
       (.post "/stash-update" stash-handler)
       (.use not-found)
       (.listen port))
