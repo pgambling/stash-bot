@@ -13,3 +13,4 @@ main.js
 config.clj
 .cljs_node_repl/
 *.log
+.repl-*

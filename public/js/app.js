@@ -19,20 +19,20 @@ function clickOffButton() {
   sendLedRequest(false);
 }
 
-function clickSetMotorPosButton() {
-  var motorDegree = parseInt(document.getElementById("motorDeg").value, 10);
+function clickSetMotorSpeedBtn() {
+  var motorSpeed = parseInt(document.getElementById("motorSpeed").value, 10);
 
-  if (isNaN(motorDegree) || motorDegree < 0) return;
+  if (isNaN(motorSpeed) || motorSpeed < 0) return;
 
-  ajaxRequest("POST", "/motor-test", { motorDegree: motorDegree });
+  ajaxRequest("POST", "/motor-test", { motorSpeed: motorSpeed });
 }
 
-function clickSetMotorMaxPosButton() {
-  ajaxRequest("POST", "/motor-test", { action: "max" });
+function clickClockwiseBtn() {
+  ajaxRequest("POST", "/motor-test", { action: "ccw" });
 }
 
-function clickSetMotorMinPosButton() {
-  ajaxRequest("POST", "/motor-test", { action: "min" });
+function clickCounterClockwiseBtn() {
+  ajaxRequest("POST", "/motor-test", { action: "cw" });
 }
 
 function clickStopMotorButton() {
@@ -42,9 +42,9 @@ function clickStopMotorButton() {
 function init() {
   document.getElementById("on").onclick = clickOnButton;
   document.getElementById("off").onclick = clickOffButton;
-  document.getElementById("setMotorPosBtn").onclick = clickSetMotorPosButton;
-  document.getElementById("setMotorMaxPosBtn").onclick = clickSetMotorMaxPosButton;
-  document.getElementById("setMotorMinPosBtn").onclick = clickSetMotorMinPosButton;
+  document.getElementById("setMotorSpeedBtn").onclick = clickSetMotorSpeedBtn;
+  document.getElementById("clockwiseBtn").onclick = clickClockwiseBtn;
+  document.getElementById("counterClockwiseBtn").onclick = clickCounterClockwiseBtn;
   document.getElementById("stopMotorBtn").onclick = clickStopMotorButton;
 }
 

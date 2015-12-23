@@ -20,6 +20,7 @@
 
 (def config nil)
 (def io-enabled? false)
+(def motor-speed (atom 0))
 
 ;;------------------------------------------------------------------------------
 ;; general functionality
@@ -50,15 +51,24 @@
     (turn-on-led)
     (js/setTimeout turn-off-led 5000))) ;; turn on LED for 5 seconds
 
-(defn- set-motor-degree! [motor-degree]
-  (println "Set motor position to " motor-degree)
-  (when io-enabled?
-    (.to servo motor-degree)))
+(defn- set-motor-speed! [new-speed]
+  (println "Set motor speed to " new-speed)
+  (reset! motor-speed new-speed))
 
-(defn- do-motor-action! [api-name]
-  (println "Calling motor API: " api-name)
+(defn- stop-motor! []
+  (println "Stopping motor")
   (when io-enabled?
-    ((aget servo api-name))))
+    (.stop servo)))
+
+(defn- set-motor-clockwise! []
+  (println "Setting motor clockwise")
+  (when io-enabled?
+    (.cw servo @motor-speed)))
+
+(defn- set-motor-counter-clockwise! []
+  (println "Setting motor counter-clockwise")
+  (when io-enabled?
+    (.ccw servo @motor-speed)))
 
 (defn- remove-content-encoding
   "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
@@ -84,12 +94,15 @@
 
 (defn- motor-test-handler [req res]
   (let [body (.-body req)
-        motor-degree (int (.-motorDegree body))
+        new-speed (.-motorSpeed body)
         action (.-action body)]
-    (when (number? motor-degree)
-      (set-motor-degree! motor-degree))
-    (when (string? action)
-      (do-motor-action! action))
+    (when (and new-speed (number? new-speed))
+      (set-motor-speed! new-speed))
+    (case action
+      "stop" (stop-motor!)
+      "cw" (set-motor-clockwise!)
+      "ccw" (set-motor-counter-clockwise!)
+      nil)
     (.sendStatus res 200)))
 
 (defn- stash-handler [req res]
@@ -119,11 +132,7 @@
     (.on board "ready"
       (fn []
         (set! led (js/five.Led. "GPIO16"))
-        (set! servo
-          (js/five.Servo
-            (clj->js
-              {:pin "GPIO18"
-               :range [0,360]})))
+        (set! servo (js/five.Servo.Continuous "GPIO18"))
         (next-fn)))))
 
 (defn- init-web-server []
