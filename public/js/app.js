@@ -27,10 +27,25 @@ function clickSetMotorPosButton() {
   ajaxRequest("POST", "/motor-test", { motorDegree: motorDegree });
 }
 
+function clickSetMotorMaxPosButton() {
+  ajaxRequest("POST", "/motor-test", { action: "max" });
+}
+
+function clickSetMotorMinPosButton() {
+  ajaxRequest("POST", "/motor-test", { action: "min" });
+}
+
+function clickStopMotorButton() {
+  ajaxRequest("POST", "/motor-test", { action: "stop" });
+}
+
 function init() {
   document.getElementById("on").onclick = clickOnButton;
   document.getElementById("off").onclick = clickOffButton;
   document.getElementById("setMotorPosBtn").onclick = clickSetMotorPosButton;
+  document.getElementById("setMotorMaxPosBtn").onclick = clickSetMotorMaxPosButton;
+  document.getElementById("setMotorMinPosBtn").onclick = clickSetMotorMinPosButton;
+  document.getElementById("stopMotorBtn").onclick = clickStopMotorButton;
 }
 
 window.onload = init;

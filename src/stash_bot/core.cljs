@@ -50,10 +50,15 @@
     (turn-on-led)
     (js/setTimeout turn-off-led 5000))) ;; turn on LED for 5 seconds
 
-(defn- set-motor-degree [motor-degree]
+(defn- set-motor-degree! [motor-degree]
   (println "Set motor position to " motor-degree)
   (when io-enabled?
     (.to servo motor-degree)))
+
+(defn- do-motor-action! [api-name]
+  (println "Calling motor API: " api-name)
+  (when io-enabled?
+    ((aget servo api-name))))
 
 (defn- remove-content-encoding
   "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
@@ -78,9 +83,13 @@
     (.sendStatus res 200)))
 
 (defn- motor-test-handler [req res]
-  (let [motor-degree (-> req .-body .-motorDegree int)]
-    (if (number? motor-degree)
-      (set-motor-degree motor-degree))
+  (let [body (.-body req)
+        motor-degree (int (.-motorDegree body))
+        action (.-action body)]
+    (when (number? motor-degree)
+      (set-motor-degree! motor-degree))
+    (when (string? action)
+      (do-motor-action! action))
     (.sendStatus res 200)))
 
 (defn- stash-handler [req res]
