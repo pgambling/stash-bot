@@ -132,7 +132,10 @@
     (.on board "ready"
       (fn []
         (set! led (js/five.Led. "GPIO16"))
-        (set! servo (js/five.Servo.Continuous "GPIO18"))
+        (set! servo
+          (js/five.Servo (js->clj {:pin "GPIO18"
+                                   :type "continuous"
+                                   :deadband [90,92]})))
         (next-fn)))))
 
 (defn- init-web-server []
