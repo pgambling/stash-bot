@@ -88,7 +88,6 @@
   (when io-enabled?
     (.play bell-animation)))
 
-
 (defn- remove-content-encoding
   "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
   [req res next-fn]
