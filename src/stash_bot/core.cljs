@@ -29,14 +29,7 @@
 (def root-dir (.resolve path "."))
 (def led nil)
 (def servo nil)
-(def animation-config
-  (clj->js {:duration 2000
-            :cuePoints [0, 0.25, 0.5, 0.75, 1.0]
-            :keyFrames [{:degrees 0}
-                        {:degrees 135}
-                        {:degrees 45}
-                        {:degrees 180}
-                        {:degrees 0}]}))
+(def animation-config (clj->js (:bell-animation config)))
 
 (defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
