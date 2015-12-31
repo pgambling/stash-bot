@@ -19,18 +19,18 @@
 ;; atoms
 ;;------------------------------------------------------------------------------
 
-(def config nil)
-(def io-enabled? false)
 (def motor-speed (atom 0))
 
 ;;------------------------------------------------------------------------------
 ;; general functionality
 ;;------------------------------------------------------------------------------
 
+(def config nil)
+(def io-enabled? false)
 (def root-dir (.resolve path "."))
 (def led nil)
 (def servo nil)
-(def animation-config (clj->js (:bell-animation config)))
+(def animation-config nil)
 
 (defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
@@ -182,6 +182,7 @@
 
   (set! config (read-config))
   (set! io-enabled? (:io-enabled? config))
+  (set! animation-config (clj->js (:bell-animation config)))
 
   (if io-enabled?
     (init-hardware init-web-server)
