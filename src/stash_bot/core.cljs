@@ -32,11 +32,11 @@
 (def bell-animation)
 (def animation-config {:duration 2000
                        :cuePoints [0, 0.25, 0.5, 0.75, 1.0]
-                       :keyFrames [{:degrees 0
-                                    {:degrees 135}
-                                    {:degrees 45}
-                                    {:degrees 180}
-                                    {:degrees 0}}]})
+                       :keyFrames [{:degrees 0}
+                                   {:degrees 135}
+                                   {:degrees 45}
+                                   {:degrees 180}
+                                   {:degrees 0}]})
 
 (defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
