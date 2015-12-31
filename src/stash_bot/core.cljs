@@ -70,6 +70,11 @@
   (when io-enabled?
     (.ccw servo @motor-speed)))
 
+(defn- set-motor-position! [position]
+  (println "Setting motor position to " position)
+  (when io-enabled?
+    (.to servo position)))
+
 (defn- remove-content-encoding
   "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
   [req res next-fn]
@@ -95,13 +100,15 @@
 (defn- motor-test-handler [req res]
   (let [body (.-body req)
         new-speed (.-motorSpeed body)
-        action (.-action body)]
+        action (.-action body)
+        position (.-position body)]
     (when (and new-speed (number? new-speed))
       (set-motor-speed! new-speed))
     (case action
       "stop" (stop-motor!)
       "cw" (set-motor-clockwise!)
       "ccw" (set-motor-counter-clockwise!)
+      "set-position" (set-motor-position! position)
       nil)
     (.sendStatus res 200)))
 
@@ -133,8 +140,7 @@
       (fn []
         (set! led (js/five.Led. "GPIO16"))
         (set! servo
-          (js/five.Servo (clj->js {:pin "GPIO18"
-                                   :type "continuous"})))
+          (js/five.Servo (clj->js {:pin "GPIO18"})))
         (next-fn)))))
 
 (defn- init-web-server []

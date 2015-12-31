@@ -39,6 +39,15 @@ function clickStopMotorButton() {
   ajaxRequest("POST", "/motor-test", { action: "stop" });
 }
 
+function clickSetMotorPosBtn() {
+  var position = parseInt(document.getElementById("motorPosition").value, 10);
+
+  if (isNaN(position) || position < 0) return;
+
+  ajaxRequest("POST", "/motor-test", { action: "set-position",
+                                       position: position });
+}
+
 function init() {
   document.getElementById("on").onclick = clickOnButton;
   document.getElementById("off").onclick = clickOffButton;
@@ -46,6 +55,7 @@ function init() {
   document.getElementById("clockwiseBtn").onclick = clickClockwiseBtn;
   document.getElementById("counterClockwiseBtn").onclick = clickCounterClockwiseBtn;
   document.getElementById("stopMotorBtn").onclick = clickStopMotorButton;
+  document.getElementById("setMotorPosBtn").onclick = clickSetMotorPosBtn;
 }
 
 window.onload = init;
