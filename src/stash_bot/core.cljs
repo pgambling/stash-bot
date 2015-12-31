@@ -13,6 +13,7 @@
 (def http (js/require "http"))
 (def express (js/require "express"))
 (def body-parser (js/require "body-parser"))
+(def five (js/require "johnny-five"))
 
 ;;------------------------------------------------------------------------------
 ;; atoms
@@ -144,8 +145,7 @@
 ;;------------------------------------------------------------------------------
 
 (defn- init-hardware [next-fn]
-  (let [five (js/require "johnny-five")
-        Raspi (js/require "raspi-io")
+  (let [Raspi (js/require "raspi-io")
         board (js/five.Board. (js-obj "io" (Raspi.)))]
     (.on board "ready"
       (fn []
