@@ -48,6 +48,10 @@ function clickSetMotorPosBtn() {
                                        position: position });
 }
 
+function clickTestBellBtn() {
+  ajaxRequest("POST", "/bell-test", {});
+}
+
 function init() {
   document.getElementById("on").onclick = clickOnButton;
   document.getElementById("off").onclick = clickOffButton;
@@ -56,6 +60,7 @@ function init() {
   document.getElementById("counterClockwiseBtn").onclick = clickCounterClockwiseBtn;
   document.getElementById("stopMotorBtn").onclick = clickStopMotorButton;
   document.getElementById("setMotorPosBtn").onclick = clickSetMotorPosBtn;
+  document.getElementById("testBellBtn").onclick = clickTestBellBtn;
 }
 
 window.onload = init;

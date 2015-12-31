@@ -29,6 +29,14 @@
 (def root-dir (.resolve path "."))
 (def led nil)
 (def servo nil)
+(def bell-animation)
+(def animation-config {:duration 2000
+                       :cuePoints [0, 0.25, 0.5, 0.75, 1.0]
+                       :keyFrames [{:degrees 0
+                                    {:degrees 135}
+                                    {:degrees 45}
+                                    {:degrees 180}
+                                    {:degrees 0}}]})
 
 (defn- read-config []
   (->> (.readFileSync fs (str root-dir "/config.clj"))
@@ -74,6 +82,12 @@
   (println "Setting motor position to " position)
   (when io-enabled?
     (.to servo position)))
+
+(defn- ring-bell! []
+  (println "Ringing the bell!")
+  (when io-enabled?
+    (.play bell-animation)))
+
 
 (defn- remove-content-encoding
   "Stash sends an invalid content-encoding header. Remove it from the request object if detected"
@@ -125,6 +139,10 @@
         (when update-to-master?
           (blink-led)))))) ;; TODO: control motor and ring bell here
 
+(defn- bell-test-handler [req res]
+  (.sendStatus res 200)
+  (ring-bell!))
+
 (defn- not-found [req res]
   (.sendStatus res 404))
 
@@ -141,6 +159,9 @@
         (set! led (js/five.Led. "GPIO16"))
         (set! servo
           (js/five.Servo (clj->js {:pin "GPIO18"})))
+        (set! bell-animation
+          (doto (js/five.Animation servo)
+                (.enqueue (clj->js animation-config))))
         (next-fn)))))
 
 (defn- init-web-server []
@@ -157,6 +178,7 @@
       (.use (.json body-parser))
       (.post "/led-test" led-test-handler)
       (.post "/motor-test" motor-test-handler)
+      (.post "/bell-test" bell-test-handler)
       (.post "/stash-update" stash-handler)
       (.use not-found)
       (.listen port))
