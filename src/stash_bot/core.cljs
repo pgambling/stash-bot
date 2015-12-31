@@ -80,7 +80,7 @@
 (defn- ring-bell! []
   (println "Ringing the bell!")
   (when io-enabled?
-    (-> (js/five.Animation servo)
+    (-> (five.Animation. servo)
         (.enqueue animation-config))))
 
 (defn- remove-content-encoding
@@ -146,12 +146,12 @@
 
 (defn- init-hardware [next-fn]
   (let [Raspi (js/require "raspi-io")
-        board (js/five.Board. (js-obj "io" (Raspi.)))]
+        board (five.Board. (js-obj "io" (Raspi.)))]
     (.on board "ready"
       (fn []
-        (set! led (js/five.Led. "GPIO16"))
+        (set! led (five.Led. "GPIO16"))
         (set! servo
-          (js/five.Servo (clj->js {:pin "GPIO18"})))
+          (five.Servo. (clj->js {:pin "GPIO18"})))
         (next-fn)))))
 
 (defn- init-web-server []
